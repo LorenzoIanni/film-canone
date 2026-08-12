@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Il Canone — Cinema per un attore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&family=Barlow+Condensed:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --ink:#0b0810;
+  --ink-raise:#151020;
+  --ink-edge:#2a2038;
+  --brass:#d3ac60;
+  --brass-dim:#9a7f47;
+  --ivory:#f4ecdd;
+  --ash:#a99cb3;
+  --seen:#7fae8a;
+}
+*{box-sizing:border-box}
+.rail{
+  position:fixed;top:0;bottom:0;width:30px;pointer-events:none;z-index:2;
+  background:var(--ink-raise);
+  border-right:1px solid var(--ink-edge);
+}
+.rail.left{left:0}.rail.right{right:0;border-right:0;border-left:1px solid var(--ink-edge)}
+.rail::before{
+  content:"";position:absolute;top:0;bottom:0;left:9px;width:12px;
+  background:repeating-linear-gradient(
+    to bottom,
+    var(--ink) 0 15px,
+    transparent 15px 34px);
+  border-radius:2px;
+}
+@media(max-width:1180px){.rail{display:none}}
+html,body{margin:0;padding:0;background-color:#0b0810}
+body{
+  background-color:#0b0810;
+  background-image:none;
+  color:var(--ivory);
+  font-family:'Spectral',Georgia,serif;
+  font-weight:300;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px 120px;position:relative;z-index:1;background-color:#0b0810}
+
+/* ---------- TESTATA ---------- */
+header.hero{padding:72px 0 40px;position:relative}
+.eyebrow{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:400;letter-spacing:.34em;text-transform:uppercase;
+  font-size:.72rem;color:var(--brass-dim);
+}
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:300;font-size:clamp(2.9rem,9vw,5.4rem);
+  line-height:.98;margin:.18em 0 .1em;color:var(--ivory);
+}
+h1 em{font-style:italic;color:var(--brass)}
+.hero p.sub{
+  max-width:52ch;color:#c4b8ce;font-size:1.02rem;margin:.9em 0 0;
+}
+
+/* ---------- PELLICOLA / PROGRESSO ---------- */
+.filmstrip{
+  margin:44px 0 8px;border-top:1px solid var(--ink-edge);
+  border-bottom:1px solid var(--ink-edge);padding:14px 0;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.perfs{display:flex;gap:4px;flex-wrap:wrap;flex:1 1 320px;min-width:200px}
+.perf{
+  width:9px;height:13px;border-radius:2px;
+  background:var(--ink-raise);border:1px solid var(--ink-edge);
+  transition:background .35s ease,border-color .35s ease,box-shadow .35s ease;
+}
+.perf.lit{background:var(--brass);border-color:var(--brass);box-shadow:0 0 9px rgba(201,165,92,.45)}
+.tally{
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.18em;
+  text-transform:uppercase;font-size:.78rem;color:var(--ash);white-space:nowrap;
+}
+.tally b{color:var(--brass);font-weight:500;font-size:1.05rem}
+
+/* ---------- CONTROLLI ---------- */
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0}
+button.ctl{
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.18em;
+  text-transform:uppercase;font-size:.74rem;
+  background:transparent;color:var(--ash);
+  border:1px solid var(--ink-edge);border-radius:2px;
+  padding:8px 15px;cursor:pointer;transition:.22s;
+}
+button.ctl:hover{color:var(--brass);border-color:var(--brass-dim)}
+button.ctl[aria-pressed="true"]{color:var(--ink);background:var(--brass);border-color:var(--brass)}
+button.ctl:focus-visible,.film:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+
+#status{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);
+  background:var(--ink-raise);border:1px solid var(--brass-dim);color:var(--brass);
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.2em;text-transform:uppercase;
+  font-size:.72rem;padding:9px 20px;border-radius:2px;z-index:40;
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+}
+#status.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- TRASFERIMENTO ---------- */
+.transfer{margin:18px 0 0;border:1px solid var(--ink-edge);border-radius:3px;padding:16px;background:var(--ink-raise)}
+.transfer p{margin:0 0 10px;color:#c4b8ce;font-size:.9rem}
+.transfer textarea{
+  width:100%;height:90px;background:#0b0810;color:var(--brass);
+  border:1px solid var(--ink-edge);border-radius:2px;padding:10px;
+  font-family:ui-monospace,Menlo,monospace;font-size:.75rem;resize:vertical;
+}
+
+/* ---------- LEGENDA ---------- */
+.legend{margin:30px 0 0;border-left:1px solid var(--brass-dim);padding-left:16px}
+.legend .label{
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.26em;
+  text-transform:uppercase;font-size:.68rem;color:var(--brass);display:block;margin-bottom:12px;
+}
+.legend dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:baseline}
+.legend dt{margin:0}
+.legend dt .flag{margin-left:0;vertical-align:0}
+.legend dd{margin:0;color:var(--ash);font-size:.88rem;line-height:1.5}
+
+/* ---------- CAPITOLI ---------- */
+section.chapter{margin:76px 0 0;scroll-margin-top:20px}
+.chapter-head{border-top:1px solid var(--ink-edge);padding-top:22px;position:relative;overflow:hidden}
+.ghost{
+  position:absolute;right:-6px;top:-14px;
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(5rem,17vw,10rem);line-height:.8;
+  color:var(--brass);opacity:.07;letter-spacing:-.04em;
+  pointer-events:none;user-select:none;
+}
+.numeral{
+  font-family:'Cormorant Garamond',serif;font-size:.95rem;
+  letter-spacing:.32em;color:var(--brass-dim);
+}
+h2{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:clamp(1.9rem,5.2vw,2.9rem);line-height:1.08;
+  margin:.16em 0 .5em;color:var(--ivory);
+}
+.notes{display:grid;gap:14px;margin:0 0 30px;grid-template-columns:1fr}
+@media(min-width:720px){.notes{grid-template-columns:1fr 1fr;gap:26px}}
+.note{border-left:1px solid var(--brass-dim);padding-left:16px}
+.note .label{
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.26em;
+  text-transform:uppercase;font-size:.68rem;color:var(--brass);display:block;margin-bottom:5px;
+}
+.note p{margin:0;color:#c4b8ce;font-size:.96rem}
+
+/* ---------- SCHEDE FILM ---------- */
+.films{display:grid;gap:2px}
+.film{
+  display:grid;grid-template-columns:34px 1fr;gap:14px;
+  background:var(--ink-raise);border:1px solid transparent;
+  border-radius:3px;padding:16px 16px 16px 12px;
+  cursor:pointer;transition:.22s;text-align:left;width:100%;
+  font:inherit;color:inherit;
+}
+.film{border-left:2px solid transparent}
+.film:hover{background:var(--ink-edge);border-left-color:var(--brass)}
+.film.done{background:rgba(111,155,122,.07)}
+.mark{
+  width:22px;height:22px;margin-top:5px;border-radius:2px;
+  border:1px solid var(--brass-dim);
+  display:flex;align-items:center;justify-content:center;
+  color:transparent;font-size:.9rem;transition:.22s;flex-shrink:0;
+}
+.film.done .mark{background:var(--seen);border-color:var(--seen);color:var(--ink)}
+.film-title{
+  font-family:'Cormorant Garamond',serif;font-size:1.34rem;
+  font-weight:400;line-height:1.2;color:var(--ivory);
+}
+.film.done .film-title{color:var(--seen)}
+.credits{
+  font-family:'Barlow Condensed',sans-serif;letter-spacing:.09em;
+  font-size:.82rem;color:var(--brass-dim);text-transform:uppercase;margin:5px 0 8px;
+}
+.credits span.year{color:var(--brass)}
+.cast{color:#b8aac2;font-size:.86rem;font-style:italic;margin:0 0 9px}
+.film p.desc{margin:0;color:#ddd2c2;font-size:.95rem}
+.flag{
+  display:inline-block;font-family:'Barlow Condensed',sans-serif;
+  letter-spacing:.2em;text-transform:uppercase;font-size:.64rem;
+  color:var(--brass);border:1px solid var(--brass-dim);
+  border-radius:2px;padding:1px 7px;margin-left:8px;vertical-align:3px;
+}
+body.only-unseen .film.done{display:none}
+
+footer{
+  margin-top:90px;border-top:1px solid var(--ink-edge);padding-top:26px;
+  color:var(--brass-dim);font-family:'Barlow Condensed',sans-serif;
+  letter-spacing:.2em;text-transform:uppercase;font-size:.72rem;
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="rail left" aria-hidden="true"></div>
+<div class="rail right" aria-hidden="true"></div>
+<div id="status" aria-live="polite"></div>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Tredici capitoli · Settantasette visioni</div>
+  <h1>Il canone<br><em>di un attore</em></h1>
+  <p class="sub">Non una classifica. Una scuola. Ogni capitolo isola una cosa sola del mestiere, e i film dentro sono lì perché quella cosa la fanno meglio di chiunque altro. Vai a sentimento: apri dove ti chiama.</p>
+
+  <div class="filmstrip">
+    <div class="perfs" id="perfs" aria-hidden="true"></div>
+    <div class="tally"><b id="count">0</b> / <span id="total">0</span> visti</div>
+  </div>
+
+  <div class="controls">
+    <button class="ctl" id="toggleUnseen" aria-pressed="false">Mostra solo da vedere</button>
+    <button class="ctl" id="exportBtn">Copia i miei segni</button>
+    <button class="ctl" id="importBtn">Incolla i segni</button>
+    <button class="ctl" id="reset">Azzera i segni</button>
+  </div>
+  <div class="transfer" id="transfer" hidden>
+    <p id="transferMsg"></p>
+    <textarea id="transferBox" spellcheck="false"></textarea>
+    <div class="controls">
+      <button class="ctl" id="transferOk">Conferma</button>
+      <button class="ctl" id="transferClose">Chiudi</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="label">Le etichette</span>
+    <dl>
+      <dt><span class="flag">Sacro</span></dt><dd>Pietra miliare. Se un attore ne deve vedere dieci in tutta la vita, questi sono tra i dieci.</dd>
+      <dt><span class="flag">Chirurgico</span></dt><dd>Da studiare col dito sulla pausa: c'è una tecnica precisa da smontare, non solo un film da guardare.</dd>
+      <dt><span class="flag">Il tuo</span></dt><dd>Parla direttamente di dove sei adesso: il terrore del palco, la recitazione che nasce dal nulla, l'immagine pura.</dd>
+      <dt><span class="flag">Ti riguarda</span></dt><dd>Mette in scena l'ossessione della grandezza. Guardalo con onestà.</dd>
+      <dt><span class="flag">Nicchia</span></dt><dd>Poco visto e a volte difficile da trovare, ma vale la caccia.</dd>
+      <dt><span class="flag">Duro</span></dt><dd>Pesante da reggere emotivamente. Scegli bene la serata.</dd>
+      <dt><span class="flag">Antidoto</span></dt><dd>Prende in giro tutto il resto del capitolo. Serve a non prendersi troppo sul serio.</dd>
+      <dt><span class="flag">Obbligatorio</span></dt><dd>Non è un film: è una lezione. Vale come una masterclass privata.</dd>
+      <dt><span class="flag">Liza</span></dt><dd>Liza Minnelli sullo schermo.</dd>
+    </dl>
+  </div>
+</header>
+
+<main id="canone"></main>
+
+<footer>Segna i film che hai già visto — restano salvati.</footer>
+</div>
+
+<script>
+const DATA = [
+{
+  n:"I", t:"Il corpo",
+  filone:"Prima della voce e prima della psicologia c'è un animale che occupa uno spazio. Questi sei film raccontano tutto con il peso, l'andatura, il respiro e la tensione muscolare — in alcuni casi senza dire una parola.",
+  occhi:"Guarda i respiri, non le facce. Copri i sottotitoli e chiediti che cosa sta provando quel corpo. Nota quando un attore cambia camminata e capisci che ha cambiato personaggio prima ancora di aprire bocca.",
+  films:[
+    {t:"Sherlock Jr.",y:1924,d:"Buster Keaton",c:"Buster Keaton, Kathryn McGuire, Ward Crane, Joe Keaton",x:"Un proiezionista che sogna di fare il detective si addormenta in cabina. Quarantaquattro minuti di acrobazie reali eseguite dall'attore stesso, senza controfigure e senza una battuta."},
+    {t:"Les Enfants du Paradis",y:1945,d:"Marcel Carné",c:"Jean-Louis Barrault, Arletty, Pierre Brasseur, Maria Casarès",x:"Il boulevard del teatro parigino dell'Ottocento, tra mimi, attori e criminali. Girato durante l'occupazione tedesca, spesso indicato come il più grande film francese di sempre.",flag:"Sacro"},
+    {t:"The Wrestler",y:2008,d:"Darren Aronofsky",c:"Mickey Rourke, Marisa Tomei, Evan Rachel Wood",x:"Un lottatore di wrestling molto oltre il proprio picco continua a salire sul ring nelle palestre di provincia. Rourke ci mette dentro la propria biografia senza dirlo mai."},
+    {t:"Raging Bull",y:1980,d:"Martin Scorsese",c:"Robert De Niro, Joe Pesci, Cathy Moriarty",x:"La vita del pugile Jake LaMotta, dentro e fuori dal ring. La trasformazione fisica più famosa della storia del cinema, ma la lezione vera è un'altra: due età che non camminano uguale."},
+    {t:"Le Samouraï",y:1967,d:"Jean-Pierre Melville",c:"Alain Delon, Nathalie Delon, François Périer, Cathy Rosier",x:"Un killer solitario e metodico a Parigi. Delon non fa quasi niente per novanta minuti e riempie lo schermo: economia assoluta del gesto."},
+    {t:"Fat City",y:1972,d:"John Huston",c:"Stacy Keach, Jeff Bridges, Susan Tyrrell, Candy Clark",x:"Due pugili dilettanti in una città di braccianti californiana: uno all'inizio, uno alla fine. Il corpo che perde, filmato senza retorica sportiva.",flag:"Nicchia"}
+  ]
+},
+{
+  n:"II", t:"Il volto e il primo piano",
+  filone:"Il territorio dove il cinema si separa dal teatro. In sala l'ultima fila vede il gesto; la macchina da presa vede il pensiero. Questi film vivono a pochi centimetri dalla pelle.",
+  occhi:"Se l'attore pensa davvero, si vede. Se finge di pensare, si vede anche quello. Cerca il momento in cui un volto cambia senza muoversi — e fermalo, e riguardalo.",
+  films:[
+    {t:"La Passion de Jeanne d'Arc",y:1928,d:"Carl Theodor Dreyer",c:"Renée Jeanne Falconetti, Eugène Silvain, Antonin Artaud",x:"Il processo a Giovanna d'Arco, quasi interamente in primi piani e senza trucco. Il metro di paragone di ogni volto filmato da allora in poi.",flag:"Sacro"},
+    {t:"Persona",y:1966,d:"Ingmar Bergman",c:"Liv Ullmann, Bibi Andersson, Margaretha Krook",x:"Un'attrice smette improvvisamente di parlare durante uno spettacolo; un'infermiera la assiste in una casa sul mare. Una delle due tace per quasi tutto il film e dice tutto."},
+    {t:"Sussurri e grida",y:1972,d:"Ingmar Bergman",c:"Harriet Andersson, Ingrid Thulin, Liv Ullmann, Kari Sylwan",x:"Tre sorelle e una domestica in una villa di fine Ottocento. Il dolore recitato senza dizione, in un rosso saturo che sembra dipinto."},
+    {t:"The Master",y:2012,d:"Paul Thomas Anderson",c:"Joaquin Phoenix, Philip Seymour Hoffman, Amy Adams",x:"Un reduce instabile incontra il fondatore carismatico di un movimento nell'America del dopoguerra. Guarda la mascella di Phoenix: ha costruito un uomo intero su una deformazione."},
+    {t:"Ordet",y:1955,d:"Carl Theodor Dreyer",c:"Henrik Malberg, Emil Hass Christensen, Preben Lerdorff Rye, Birgitte Federspiel",x:"Una famiglia contadina danese divisa dalla fede. Recitazione trattenuta fino all'immobilità, in piani lunghissimi.",flag:"Nicchia"}
+  ]
+},
+{
+  n:"III", t:"La voce e la parola",
+  filone:"Il tuo terreno naturale, ma qui non si tratta di suono: si tratta di che cosa ci sta sotto. Il ritmo come arma, la parola come pensiero, l'accento come veicolo invisibile.",
+  occhi:"Nessuno di questi attori sta pensando alla propria bocca. Ascolta dove mettono le pause e dove accelerano — è lì che sta il personaggio, non nella pronuncia.",
+  films:[
+    {t:"The Entertainer",y:1960,d:"Tony Richardson",c:"Laurence Olivier, Brenda de Banzie, Joan Plowright, Alan Bates, Albert Finney",x:"Un artista di varietà di terz'ordine tiene in piedi uno spettacolo morente in una cittadina balneare inglese. Il più grande tecnico vocale del Novecento che sceglie di suonare mediocre.",flag:"Chirurgico"},
+    {t:"Glengarry Glen Ross",y:1992,d:"James Foley",c:"Al Pacino, Jack Lemmon, Alec Baldwin, Ed Harris, Alan Arkin, Kevin Spacey",x:"Una notte in un'agenzia immobiliare dove ogni venditore rischia il posto. Dialoghi di David Mamet: tre modi diversi di aggredire qualcuno con le parole."},
+    {t:"Barry Lyndon",y:1975,d:"Stanley Kubrick",c:"Ryan O'Neal, Marisa Berenson, Patrick Magee, Hardy Krüger",x:"L'ascesa sociale di un irlandese nel Settecento europeo. La parola raffreddata al massimo grado: il contrario esatto della retorica."},
+    {t:"My Dinner with Andre",y:1981,d:"Louis Malle",c:"Wallace Shawn, André Gregory",x:"Due uomini di teatro cenano insieme e parlano. Nient'altro, per quasi due ore. Se regge questo, regge tutto.",flag:"Nicchia"},
+    {t:"A Man for All Seasons",y:1966,d:"Fred Zinnemann",c:"Paul Scofield, Robert Shaw, Wendy Hiller, Orson Welles, Susannah York",x:"Tommaso Moro davanti alle pretese di Enrico VIII. Received Pronunciation da manuale, ma soprattutto la parola usata come atto morale."},
+    {t:"Il Vangelo secondo Matteo",y:1964,d:"Pier Paolo Pasolini",c:"Enrique Irazoqui, Margherita Caruso, Susanna Pasolini",x:"Il testo evangelico recitato quasi alla lettera da attori non professionisti, contadini e amici del regista. Volti veri che dicono parole altissime."}
+  ]
+},
+{
+  n:"IV", t:"L'ascolto e la reazione",
+  filone:"Il segreto più grande del mestiere e il più invisibile: il novanta per cento degli attori aspetta il proprio turno per parlare. Questi non lo fanno mai, ed è per questo che sembrano rubati con una telecamera nascosta.",
+  occhi:"Metti la mano sullo schermo e copri chi sta parlando. Guarda solo l'altro. È lì che sta la recitazione — e quando lo vedi una volta, non riesci più a non vederlo.",
+  films:[
+    {t:"Mikey and Nicky",y:1976,d:"Elaine May",c:"Peter Falk, John Cassavetes, Ned Beatty",x:"Due amici d'infanzia, entrambi legati alla malavita, passano una notte insieme per le strade di Philadelphia. Girato con più macchine contemporaneamente per non perdere niente.",flag:"Nicchia"},
+    {t:"Faces",y:1968,d:"John Cassavetes",c:"John Marley, Gena Rowlands, Lynn Carlin, Seymour Cassel",x:"Un matrimonio borghese californiano che si sfalda nell'arco di una notte. Il disagio reale tra persone reali, in 16mm."},
+    {t:"A Woman Under the Influence",y:1974,d:"John Cassavetes",c:"Gena Rowlands, Peter Falk",x:"Una moglie e madre di periferia il cui comportamento diventa insostenibile per la famiglia. Forse il film più coraggioso mai recitato da un'attrice.",flag:"Chirurgico"},
+    {t:"Before Sunrise",y:1995,d:"Richard Linklater",c:"Ethan Hawke, Julie Delpy",x:"Due sconosciuti scendono dallo stesso treno e camminano per Vienna fino all'alba. Due persone che si ascoltano davvero, per un film intero."},
+    {t:"Before Sunset",y:2004,d:"Richard Linklater",c:"Ethan Hawke, Julie Delpy",x:"Il seguito, nove anni dopo, girato quasi in tempo reale a Parigi. Il piano sequenza finale è un manuale di ascolto in movimento."},
+    {t:"Marriage Story",y:2019,d:"Noah Baumbach",c:"Adam Driver, Scarlett Johansson, Laura Dern, Alan Alda, Ray Liotta",x:"Una coppia di teatranti attraversa un divorzio tra New York e Los Angeles. Nella scena della lite guarda i momenti in cui subiscono, non quelli in cui attaccano."}
+  ]
+},
+{
+  n:"V", t:"L'obiettivo — volere, non sentire",
+  filone:"Nessuno di questi personaggi sta 'facendo un'emozione'. Vogliono qualcosa da qualcuno, con violenza, e cambiano tattica quando non funziona. L'emozione arriva dopo, come effetto collaterale.",
+  occhi:"Per ogni scena chiediti una sola cosa: che cosa vuole da lui, adesso? Poi nota il momento esatto in cui capisce che quella strada non funziona e ne prende un'altra.",
+  films:[
+    {t:"12 Angry Men",y:1957,d:"Sidney Lumet",c:"Henry Fonda, Lee J. Cobb, Ed Begley, E.G. Marshall, Jack Klugman, Martin Balsam",x:"Dodici giurati chiusi in una stanza d'estate devono decidere all'unanimità. Dodici obiettivi in conflitto, quasi nessuna uscita dalla stanza."},
+    {t:"There Will Be Blood",y:2007,d:"Paul Thomas Anderson",c:"Daniel Day-Lewis, Paul Dano, Kevin J. O'Connor",x:"Un cercatore di petrolio costruisce un impero nella California di inizio Novecento. Day-Lewis vuole qualcosa in ogni singolo secondo di pellicola."},
+    {t:"The Hustler",y:1961,d:"Robert Rossen",c:"Paul Newman, Jackie Gleason, Piper Laurie, George C. Scott",x:"Un giocatore di biliardo di talento sfida il campione imbattuto. La fame come unico motore, e il prezzo che chiede."},
+    {t:"Anatomy of a Fall",y:2023,d:"Justine Triet",c:"Sandra Hüller, Swann Arlaud, Milo Machado Graner",x:"Una scrittrice viene processata dopo la morte del marito in uno chalet isolato. Ogni scena è costruita su che cosa sta cercando di ottenere in quel momento."},
+    {t:"Dog Day Afternoon",y:1975,d:"Sidney Lumet",c:"Al Pacino, John Cazale, Charles Durning",x:"Una rapina in banca a Brooklyn che va storta e diventa un assedio pubblico. Pacino cambia strategia ogni due minuti per ottenere quello che vuole."}
+  ]
+},
+{
+  n:"VI", t:"La trasformazione",
+  filone:"Il capitolo più spettacolare e il più frainteso. Qui dentro c'è chi si trasforma per servire un obiettivo interno, e in coda c'è la satira più feroce mai fatta su chi lo fa per il premio.",
+  occhi:"Distingui sempre la trasformazione dalla cosmesi. Chiediti: se gli togliessi il corpo nuovo, resterebbe un personaggio? Chiudi il capitolo con Tropic Thunder e ridi di te stesso.",
+  films:[
+    {t:"My Left Foot",y:1989,d:"Jim Sheridan",c:"Daniel Day-Lewis, Brenda Fricker, Ray McAnally, Hugh O'Conor",x:"La vita di Christy Brown, scrittore e pittore irlandese affetto da paralisi cerebrale, che poteva controllare solo il piede sinistro."},
+    {t:"Frances",y:1982,d:"Graeme Clifford",c:"Jessica Lange, Kim Stanley, Sam Shepard",x:"La parabola di Frances Farmer, attrice hollywoodiana degli anni Trenta in rotta con lo studio system. Lange ci si perde dentro fino in fondo.",flag:"Nicchia"},
+    {t:"The Elephant Man",y:1980,d:"David Lynch",c:"John Hurt, Anthony Hopkins, Anne Bancroft, John Gielgud",x:"Un uomo gravemente deforme nella Londra vittoriana viene sottratto a un baraccone da fiera. Sotto chili di protesi restano solo voce e postura."},
+    {t:"Monster",y:2003,d:"Patty Jenkins",c:"Charlize Theron, Christina Ricci, Bruce Dern",x:"La storia di Aileen Wuornos, prostituta della Florida. Trasformazione fisica totale, ma sempre al servizio di qualcosa che sta sotto."},
+    {t:"La Vie en Rose",y:2007,d:"Olivier Dahan",c:"Marion Cotillard, Sylvie Testud, Gérard Depardieu",x:"Édith Piaf dai vicoli di Belleville alla consacrazione, raccontata in ordine sparso. Un'attrice che copre trent'anni di vita di un'altra."},
+    {t:"Tropic Thunder",y:2008,d:"Ben Stiller",c:"Ben Stiller, Robert Downey Jr., Jack Black, Tom Cruise",x:"Un gruppo di divi viziati gira un film di guerra nella giungla e finisce in una guerra vera. La satira più intelligente mai fatta sull'ossessione del metodo.",flag:"Antidoto"}
+  ]
+},
+{
+  n:"VII", t:"Il crollo psicologico",
+  filone:"Il territorio più pericoloso del mestiere e il più richiesto ai provini. Tutti questi film hanno in comune una cosa: il crollo vero è contenuto, non urlato.",
+  occhi:"Misura quanto poco fanno nel momento più forte. Chi urla non fa paura; chi trattiene sì. E nota sempre quanto tempo passa prima che il personaggio ceda davvero.",
+  films:[
+    {t:"Opening Night",y:1977,d:"John Cassavetes",c:"Gena Rowlands, John Cassavetes, Ben Gazzara, Joan Blondell",x:"Un'attrice di teatro in prova per una nuova commedia inizia a non reggere più il ruolo. Il film più onesto mai fatto sul terrore del palco.",flag:"Il tuo"},
+    {t:"Through a Glass Darkly",y:1961,d:"Ingmar Bergman",c:"Harriet Andersson, Max von Sydow, Gunnar Björnstrand, Lars Passgård",x:"Una famiglia in vacanza su un'isola baltica; una delle figlie è appena uscita da una clinica. La psicosi recitata senza nessuno spettacolo."},
+    {t:"Repulsion",y:1965,d:"Roman Polanski",c:"Catherine Deneuve, Ian Hendry, John Fraser, Yvonne Furneaux",x:"Una giovane manicure resta sola nell'appartamento londinese della sorella. Il crollo filmato dall'interno della testa."},
+    {t:"The Piano Teacher",y:2001,d:"Michael Haneke",c:"Isabelle Huppert, Benoît Magimel, Annie Girardot",x:"Una docente del conservatorio di Vienna, rigidissima, incontra un allievo. Ghiaccio che copre un incendio, per due ore.",flag:"Duro"},
+    {t:"Sophie's Choice",y:1982,d:"Alan J. Pakula",c:"Meryl Streep, Kevin Kline, Peter MacNicol",x:"Una sopravvissuta polacca a Brooklyn nel dopoguerra, vista dagli occhi di un giovane scrittore del Sud. Guarda quanto poco fa nella scena che sai."}
+  ]
+},
+{
+  n:"VIII", t:"La contraddizione e il segreto",
+  filone:"Personaggi che passano un film intero a non dire la cosa. Il volto che nasconde è magnetico, il volto vuoto è morto — questa è la prova.",
+  occhi:"Cerca il doppio fondo di ogni scena. Chiediti che cosa sa il personaggio e non dice, e nota come il non detto cambia il modo in cui dice tutto il resto.",
+  films:[
+    {t:"The Remains of the Day",y:1993,d:"James Ivory",c:"Anthony Hopkins, Emma Thompson, James Fox, Christopher Reeve",x:"Il maggiordomo di una grande casa inglese tra le due guerre ripercorre gli anni di servizio. Masterclass assoluta sul segreto custodito.",flag:"Chirurgico"},
+    {t:"In the Mood for Love",y:2000,d:"Wong Kar-wai",c:"Tony Leung, Maggie Cheung",x:"Due vicini di casa nella Hong Kong del 1962 scoprono di avere qualcosa in comune. Tutto il film sta in ciò che non viene detto."},
+    {t:"Chinatown",y:1974,d:"Roman Polanski",c:"Jack Nicholson, Faye Dunaway, John Huston",x:"Un investigatore privato di Los Angeles indaga su un banale caso di adulterio negli anni Trenta. Ogni scena di Dunaway ha un secondo strato."},
+    {t:"A Separation",y:2011,d:"Asghar Farhadi",c:"Peyman Moaadi, Leila Hatami, Sareh Bayat, Shahab Hosseini",x:"Una coppia di Teheran si separa e un incidente domestico innesca una catena legale. Tutti mentono un po', tutti hanno ragione un po'."},
+    {t:"Phantom Thread",y:2017,d:"Paul Thomas Anderson",c:"Daniel Day-Lewis, Vicky Krieps, Lesley Manville",x:"Un sarto di alta moda nella Londra degli anni Cinquanta accoglie in casa una cameriera. Due persone che si combattono sorridendo."}
+  ]
+},
+{
+  n:"IX", t:"Il mestiere dall'interno",
+  filone:"Adesso che sai come funziona la macchina, guarda i film che la macchina l'hanno messa in scena. Il teatro, il set, l'attore come soggetto invece che come strumento.",
+  occhi:"Qui non si ruba una tecnica, si prende una misura. Riconosci nei personaggi i meccanismi che hai già visto negli altri capitoli — e riconosci te stesso, dove capita.",
+  films:[
+    {t:"All About Eve",y:1950,d:"Joseph L. Mankiewicz",c:"Bette Davis, Anne Baxter, George Sanders, Celeste Holm, Marilyn Monroe",x:"Una diva teatrale di Broadway accoglie una giovane ammiratrice nella propria cerchia. La Bibbia del mestiere: ambizione, invecchiamento, tradimento.",flag:"Sacro"},
+    {t:"Vanya on 42nd Street",y:1994,d:"Louis Malle",c:"Wallace Shawn, Julianne Moore, Larry Pine, Brooke Smith, André Gregory",x:"Un gruppo di attori prova Zio Vanja in abiti civili dentro un teatro newyorkese diroccato. Vedi la recitazione nascere dal nulla, senza trucco e senza scene.",flag:"Il tuo"},
+    {t:"Sunset Boulevard",y:1950,d:"Billy Wilder",c:"Gloria Swanson, William Holden, Erich von Stroheim, Nancy Olson",x:"Uno sceneggiatore squattrinato finisce nella villa di una diva del muto dimenticata. Swanson, vera star del muto, recita quasi se stessa."},
+    {t:"8½",y:1963,d:"Federico Fellini",c:"Marcello Mastroianni, Anouk Aimée, Claudia Cardinale, Sandra Milo",x:"Un regista in crisi si rifugia in una stazione termale mentre la produzione lo aspetta. Il blocco creativo e il circo che gira intorno all'artista."},
+    {t:"Birdman",y:2014,d:"Alejandro González Iñárritu",c:"Michael Keaton, Edward Norton, Emma Stone, Naomi Watts",x:"Un ex divo dei film di supereroi tenta la riabilitazione artistica dirigendosi a Broadway. Girato come un unico piano sequenza apparente.",flag:"Ti riguarda"},
+    {t:"Synecdoche, New York",y:2008,d:"Charlie Kaufman",c:"Philip Seymour Hoffman, Samantha Morton, Michelle Williams, Catherine Keener",x:"Un regista teatrale costruisce dentro un capannone una replica della propria vita, sempre più grande. La vertigine dell'arte che divora chi la fa.",flag:"Nicchia"},
+    {t:"The Player",y:1992,d:"Robert Altman",c:"Tim Robbins, Greta Scacchi, Fred Ward, Whoopi Goldberg",x:"Un dirigente di studio hollywoodiano riceve minacce anonime da uno sceneggiatore rifiutato. Il cinismo dell'industria raccontato dall'industria."},
+    {t:"Barton Fink",y:1991,d:"Joel e Ethan Coen",c:"John Turturro, John Goodman, Judy Davis, Michael Lerner",x:"Un drammaturgo di successo viene assunto da uno studio di Hollywood negli anni Quaranta e chiuso in un albergo a scrivere."},
+    {t:"The Artist",y:2011,d:"Michel Hazanavicius",c:"Jean Dujardin, Bérénice Bejo, John Goodman, James Cromwell",x:"Una star del muto e una giovane comparsa si incrociano proprio mentre arriva il sonoro. Muto e in bianco e nero, girato nel ventunesimo secolo."}
+  ]
+},
+{
+  n:"X", t:"L'icona e il prezzo della fama",
+  filone:"Il capitolo che ti riguarda più di quanto vorresti. L'ambizione totale ha un costo, e questi film te lo mostrano prima che tu lo paghi. Tre versioni dello stesso scheletro a sessant'anni di distanza, e due Liza Minnelli.",
+  occhi:"Guardali come avvertimenti, non come sogni. E nelle tre versioni di A Star Is Born nota che cambia tutto tranne il meccanismo: è la prova che il mestiere è sempre lo stesso e il mondo intorno no.",
+  films:[
+    {t:"Cabaret",y:1972,d:"Bob Fosse",c:"Liza Minnelli, Michael York, Joel Grey, Marisa Berenson",x:"Una cantante americana al Kit Kat Klub di Berlino mentre fuori sale il nazismo. Il palco come rifugio e come specchio del mondo.",flag:"Liza"},
+    {t:"All That Jazz",y:1979,d:"Bob Fosse",c:"Roy Scheider, Jessica Lange, Ann Reinking, Ben Vereen",x:"Un coreografo di Broadway monta un film e allestisce uno spettacolo insieme, a colpi di pillole e sigarette. Autoritratto feroce del regista su se stesso."},
+    {t:"A Star Is Born",y:1954,d:"George Cukor",c:"Judy Garland, James Mason, Jack Carson",x:"Una cantante viene lanciata da un divo in declino. Garland, madre di Liza Minnelli, recita qualcosa di molto vicino alla propria vita."},
+    {t:"A Star Is Born",y:1976,d:"Frank Pierson",c:"Barbra Streisand, Kris Kristofferson",x:"La stessa storia spostata nel rock degli anni Settanta, tra stadi e case discografiche."},
+    {t:"A Star Is Born",y:2018,d:"Bradley Cooper",c:"Bradley Cooper, Lady Gaga, Sam Elliott",x:"La versione contemporanea, con le esibizioni musicali registrate dal vivo sul set."},
+    {t:"The Red Shoes",y:1948,d:"Michael Powell e Emeric Pressburger",c:"Moira Shearer, Anton Walbrook, Marius Goring",x:"Una giovane ballerina entra in una compagnia guidata da un impresario totalizzante. La vocazione che divora chi la porta, in un Technicolor irripetibile.",flag:"Sacro"},
+    {t:"What Ever Happened to Baby Jane?",y:1962,d:"Robert Aldrich",c:"Bette Davis, Joan Crawford, Victor Buono",x:"Due sorelle, entrambe ex attrici, vivono chiuse nella stessa villa di Hollywood. Interpretate da due dive che si detestavano davvero."},
+    {t:"The King of Comedy",y:1982,d:"Martin Scorsese",c:"Robert De Niro, Jerry Lewis, Sandra Bernhard",x:"Un aspirante comico convinto del proprio talento perseguita un presentatore televisivo. L'ossessione per la celebrità quarant'anni prima dei social."},
+    {t:"New York, New York",y:1977,d:"Martin Scorsese",c:"Liza Minnelli, Robert De Niro",x:"Una cantante e un sassofonista si incontrano nel dopoguerra e provano a stare insieme mentre le carriere divergono.",flag:"Liza"}
+  ]
+},
+{
+  n:"XI", t:"Il grottesco, il comico, il rischio",
+  filone:"Chi non sa fare il comico non sa fare niente. Il timing è la disciplina più dura che esista, e l'eccesso è il rischio più difficile da rendere credibile.",
+  occhi:"Cronometra le pause. Il comico è tutto lì. Poi nota che nessuno di questi attori sta facendo il buffo: stanno tutti facendo qualcosa di terribilmente serio.",
+  films:[
+    {t:"The Great Dictator",y:1940,d:"Charlie Chaplin",c:"Charlie Chaplin, Paulette Goddard, Jack Oakie",x:"Un barbiere ebreo e un dittatore identici nell'aspetto in un paese immaginario. Uscito mentre la guerra era in corso.",flag:"Sacro"},
+    {t:"Some Like It Hot",y:1959,d:"Billy Wilder",c:"Marilyn Monroe, Tony Curtis, Jack Lemmon",x:"Due musicisti testimoni di un omicidio si nascondono in un'orchestra femminile in Florida. Timing chirurgico, battuta su battuta."},
+    {t:"Dr. Strangelove",y:1964,d:"Stanley Kubrick",c:"Peter Sellers, George C. Scott, Sterling Hayden, Slim Pickens",x:"La crisi nucleare vista da una sala comandi, un bombardiere e un ufficio. Sellers interpreta tre personaggi completamente diversi."},
+    {t:"Withnail and I",y:1987,d:"Bruce Robinson",c:"Richard E. Grant, Paul McGann, Richard Griffiths",x:"Due attori disoccupati a Londra nel 1969 vanno in vacanza in campagna. Eccesso totale che resta sempre credibile.",flag:"Nicchia"},
+    {t:"Toni Erdmann",y:2016,d:"Maren Ade",c:"Peter Simonischek, Sandra Hüller",x:"Un padre burlone piomba nella vita professionale della figlia consulente a Bucarest, travestito. L'imbarazzo trattato come materia drammatica."},
+    {t:"The Lobster",y:2015,d:"Yorgos Lanthimos",c:"Colin Farrell, Rachel Weisz, Léa Seydoux, John C. Reilly",x:"In un futuro prossimo i single vengono ospitati in un albergo con una regola precisa. Recitazione volutamente piatta: studia perché funziona."}
+  ]
+},
+{
+  n:"XII", t:"Il non-recitare",
+  filone:"L'ultimo stadio e il più difficile: sparire. Bresson odiava la parola attore e usava 'modelli'; Parajanov non racconta neanche, dipinge. Vedere il contrario di tutto ciò che ti insegnano è indispensabile.",
+  occhi:"Non cercare la bravura, non c'è. Cerca la presenza. E quando ti annoi, chiediti perché — spesso è perché sei abituato a un ritmo, non perché il film sia debole.",
+  films:[
+    {t:"Sayat-Nova (Il colore del melograno)",y:1969,d:"Sergej Parajanov",c:"Sofiko Chiaureli, Melkon Aleksanyan, Vilen Galstyan",x:"La vita del poeta armeno Sayat-Nova raccontata per quadri fissi, senza narrazione e quasi senza dialogo. Non è recitazione narrativa: è icona vivente.",flag:"Il tuo"},
+    {t:"Au Hasard Balthazar",y:1966,d:"Robert Bresson",c:"Anne Wiazemsky, François Lafarge, Walter Green",x:"La vita di un asino che passa di padrone in padrone nella campagna francese. Interpreti non professionisti diretti a togliere ogni espressione."},
+    {t:"Pickpocket",y:1959,d:"Robert Bresson",c:"Martin LaSalle, Marika Green, Pierre Leymarie",x:"Un giovane parigino si dedica al borseggio con metodo quasi religioso. Le mani contano più dei volti."},
+    {t:"Vivre sa vie",y:1962,d:"Jean-Luc Godard",c:"Anna Karina, Sady Rebbot, André S. Labarthe",x:"Dodici quadri nella vita di una giovane parigina che vuole fare l'attrice. Il volto che recita non recitando."},
+    {t:"Umberto D.",y:1952,d:"Vittorio De Sica",c:"Carlo Battisti, Maria Pia Casilio, Lina Gennari",x:"Un pensionato romano e il suo cane cercano di non perdere la stanza in affitto. Il protagonista era un professore universitario, non un attore."},
+    {t:"An Angel at My Table",y:1990,d:"Jane Campion",c:"Kerry Fox, Alexia Keogh, Karen Fergusson",x:"La vita della scrittrice neozelandese Janet Frame in tre età, interpretata da tre attrici diverse. La costruzione lenta di una voce interiore.",flag:"Nicchia"},
+    {t:"Nostalghia",y:1983,d:"Andrej Tarkovskij",c:"Oleg Jankovskij, Erland Josephson, Domiziana Giordano",x:"Un intellettuale russo viaggia in Italia sulle tracce di un musicista del Settecento. La scena della candela: nove minuti, un uomo, una fiamma."}
+  ]
+},
+{
+  n:"XIII", t:"Le voci dirette",
+  filone:"Non film: testimonianze. Qui gli attori spiegano il mestiere con le proprie parole, e vale come una lezione privata che non potresti permetterti.",
+  occhi:"Ascolta come parlano del lavoro, non dei risultati. Nota quante volte usano parole concrete — volere, ascoltare, respirare — e quante volte parlano di talento. Quasi mai.",
+  films:[
+    {t:"Listen to Me Marlon",y:2015,d:"Stevan Riley",c:"Marlon Brando (registrazioni audio private)",x:"Documentario montato interamente sulle centinaia di ore di nastri che Brando registrò per sé. Lui che racconta il mestiere con la propria voce, senza intermediari.",flag:"Obbligatorio"},
+    {t:"Inside the Actors Studio",y:1994,d:"serie televisiva, conduttore James Lipton",c:"Marlon Brando, Al Pacino, Dustin Hoffman, Meryl Streep e altri",x:"Interviste lunghe davanti agli studenti dell'Actors Studio. Cerca in particolare le puntate con Brando, Pacino e Hoffman."}
+  ]
+}
+];
+
+/* ---------- STORAGE ---------- */
+const KEY='canone-visti';
+let ready=false;
+
+function lsGet(){ try{const v=localStorage.getItem(KEY); return v?JSON.parse(v):null;}catch(e){return null;} }
+function lsSet(a){ try{localStorage.setItem(KEY,JSON.stringify(a));}catch(e){} }
+
+const store={
+  async get(){
+    let cloud=null;
+    if(window.storage){
+      try{ const r=await window.storage.get(KEY); if(r&&r.value) cloud=JSON.parse(r.value); }catch(e){}
+    }
+    const local=lsGet();
+    // unione: non si perde mai niente
+    const merged=[...new Set([...(cloud||[]),...(local||[])])];
+    return merged;
+  },
+  async set(list){
+    lsSet(list);                       // sempre e subito, non fallisce mai
+    if(window.storage){
+      try{ await window.storage.set(KEY,JSON.stringify(list)); }catch(e){}
+    }
+  }
+};
+
+let seen=[];
+const id=(ch,f)=>ch+'|'+f.t+'|'+f.y;
+
+function render(){
+  const main=document.getElementById('canone');
+  main.innerHTML=DATA.map(ch=>`
+    <section class="chapter">
+      <div class="chapter-head">
+        <span class="ghost" aria-hidden="true">${ch.n}</span>
+        <div class="numeral">${ch.n}</div>
+        <h2>${ch.t}</h2>
+      </div>
+      <div class="notes">
+        <div class="note"><span class="label">Il filone</span><p>${ch.filone}</p></div>
+        <div class="note"><span class="label">Con che occhi</span><p>${ch.occhi}</p></div>
+      </div>
+      <div class="films">
+        ${ch.films.map(f=>`
+          <button class="film" data-id="${id(ch.n,f).replace(/"/g,'&quot;')}" aria-pressed="false">
+            <span class="mark" aria-hidden="true">✓</span>
+            <span>
+              <span class="film-title">${f.t}${f.flag?`<span class="flag">${f.flag}</span>`:''}</span>
+              <div class="credits"><span class="year">${f.y}</span> · ${f.d}</div>
+              <div class="cast">${f.c}</div>
+              <p class="desc">${f.x}</p>
+            </span>
+          </button>`).join('')}
+      </div>
+    </section>`).join('');
+
+  document.querySelectorAll('.film').forEach(el=>{
+    el.addEventListener('click',()=>toggle(el));
+  });
+  paint();
+}
+
+function toggle(el){
+  if(!ready){ flash('Un attimo, sto ancora caricando i tuoi segni…'); return; }
+  const k=el.dataset.id;
+  const i=seen.indexOf(k);
+  if(i>-1) seen.splice(i,1); else seen.push(k);
+  store.set(seen);
+  paint();
+  flash('Salvato');
+}
+
+function paint(){
+  const all=document.querySelectorAll('.film');
+  all.forEach(el=>{
+    const on=seen.includes(el.dataset.id);
+    el.classList.toggle('done',on);
+    el.setAttribute('aria-pressed',on);
+  });
+  const total=all.length, n=seen.length;
+  document.getElementById('count').textContent=n;
+  document.getElementById('total').textContent=total;
+  const perfs=document.getElementById('perfs');
+  if(perfs.children.length!==total){
+    perfs.innerHTML=Array.from({length:total},()=>'<i class="perf"></i>').join('');
+  }
+  [...perfs.children].forEach((p,i)=>p.classList.toggle('lit',i<n));
+}
+
+function flash(msg){
+  const b=document.getElementById('status');
+  b.textContent=msg; b.classList.add('on');
+  clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove('on'),1600);
+}
+
+document.getElementById('toggleUnseen').addEventListener('click',e=>{
+  const on=document.body.classList.toggle('only-unseen');
+  e.target.setAttribute('aria-pressed',on);
+  e.target.textContent=on?'Mostra tutti':'Mostra solo da vedere';
+});
+const tPanel=document.getElementById('transfer'),
+      tBox=document.getElementById('transferBox'),
+      tMsg=document.getElementById('transferMsg'),
+      tOk=document.getElementById('transferOk');
+let tMode='export';
+
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  tMode='export';
+  tMsg.textContent='Questo è il codice dei tuoi '+seen.length+' film segnati. Selezionalo tutto, copialo, e incollalo nella versione nuova con il pulsante "Incolla i segni".';
+  tBox.value=JSON.stringify(seen);
+  tOk.hidden=true; tPanel.hidden=false; tBox.select();
+});
+
+document.getElementById('importBtn').addEventListener('click',()=>{
+  tMode='import';
+  tMsg.textContent='Incolla qui il codice copiato dalla versione precedente, poi premi Conferma.';
+  tBox.value=''; tOk.hidden=false; tPanel.hidden=false; tBox.focus();
+});
+
+tOk.addEventListener('click',()=>{
+  try{
+    const arr=JSON.parse(tBox.value.trim());
+    if(!Array.isArray(arr)) throw 0;
+    seen=arr; store.set(seen); paint();
+    tMsg.textContent='Fatto: '+seen.length+' film ripristinati.';
+    tBox.value=''; tOk.hidden=true;
+  }catch(e){ tMsg.textContent='Il codice non è valido. Ricontrolla di averlo copiato per intero.'; }
+});
+
+document.getElementById('transferClose').addEventListener('click',()=>{tPanel.hidden=true});
+
+document.getElementById('reset').addEventListener('click',()=>{
+  seen=[]; store.set(seen); paint();
+});
+
+render();
+(async()=>{
+  try{ seen=await store.get(); }catch(e){ seen=lsGet()||[]; }
+  ready=true;
+  paint();
+})();
+</script>
+</body>
+</html>
